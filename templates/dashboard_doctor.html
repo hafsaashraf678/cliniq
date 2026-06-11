@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard — ClinIQ{% endblock %}
+{% block content %}
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="avatar doctor">{{ current_user.name[0].upper() }}</div>
+      <div class="profile-info">
+        <div class="pname">Dr. {{ current_user.name }}</div>
+        <div class="prole doctor">{{ doctor.specialization }}</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a href="{{ url_for('dashboard') }}" class="nav-link active"><span class="ni">🏠</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Patient Care</div>
+      <a href="#appointments"  class="nav-link"><span class="ni">📅</span> Appointments</a>
+      <a href="#prescriptions" class="nav-link"><span class="ni">💊</span> Prescriptions Written</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);margin-bottom:10px;">
+        <div class="text-xs text-muted" style="margin-bottom:4px;">License</div>
+        <div class="text-sm fw-700" style="color:var(--primary-light);">{{ doctor.license_number }}</div>
+      </div>
+      <a href="{{ url_for('logout') }}" class="nav-link danger"><span class="ni">🚪</span> Logout</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header a1">
+      <div>
+        <h1>Dr. {{ current_user.name }} 👨‍⚕️</h1>
+        <p class="sub">{{ doctor.specialization }} · License: {{ doctor.license_number }}</p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row a2">
+      <div class="stat-card purple">
+        <div class="stat-top"><div class="stat-icon purple">📅</div><span class="stat-trend neutral">All</span></div>
+        <div class="stat-value">{{ appointments|length }}</div>
+        <div class="stat-label">Total Appointments</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-top"><div class="stat-icon amber">⏳</div><span class="stat-trend up">Action needed</span></div>
+        <div class="stat-value">{{ pending }}</div>
+        <div class="stat-label">Pending Approval</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-top"><div class="stat-icon green">✅</div><span class="stat-trend up">Active</span></div>
+        <div class="stat-value">{{ approved }}</div>
+        <div class="stat-label">Approved</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="stat-top"><div class="stat-icon cyan">💊</div><span class="stat-trend neutral">Rx</span></div>
+        <div class="stat-value">{{ prescriptions|length }}</div>
+        <div class="stat-label">Prescriptions Written</div>
+      </div>
+    </div>
+
+    <!-- Appointments -->
+    <div class="card a3" id="appointments">
+      <div class="card-header">
+        <h3>📅 Patient Appointments</h3>
+        {% if pending > 0 %}
+        <span class="badge badge-pending">{{ pending }} pending</span>
+        {% endif %}
+      </div>
+      <div class="card-body pad-sm">
+        {% if appointments %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Patient</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              {% for a in appointments %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#4f46e5);display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;flex-shrink:0;">
+                      {{ a.patient.user.name[0].upper() }}
+                    </div>
+                    <strong>{{ a.patient.user.name }}</strong>
+                  </div>
+                </td>
+                <td>{{ a.date }}</td>
+                <td>{{ a.time }}</td>
+                <td class="text-muted text-sm" style="max-width:180px;">{{ a.reason[:45] if a.reason else '—' }}{% if a.reason and a.reason|length > 45 %}...{% endif %}</td>
+                <td><span class="badge badge-{{ a.status }}">{{ a.status.title() }}</span></td>
+                <td>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    {% if a.status == 'pending' %}
+                    <a href="{{ url_for('update_appointment', appt_id=a.id, status='approved') }}"   class="btn btn-success btn-sm">✅ Approve</a>
+                    <a href="{{ url_for('update_appointment', appt_id=a.id, status='cancelled') }}"  class="btn btn-danger  btn-sm">❌ Cancel</a>
+                    {% elif a.status == 'approved' %}
+                    <a href="{{ url_for('update_appointment', appt_id=a.id, status='completed') }}"  class="btn btn-ghost   btn-sm">✔ Done</a>
+                    <a href="{{ url_for('write_prescription', patient_id=a.patient_id) }}"            class="btn btn-primary btn-sm">💊 Prescribe</a>
+                    {% elif a.status == 'completed' %}
+                    <a href="{{ url_for('write_prescription', patient_id=a.patient_id) }}"            class="btn btn-outline btn-sm">💊 Add Rx</a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty">
+          <div class="empty-icon">📅</div>
+          <h4>No appointments yet</h4>
+          <p>Patients will appear here once they book appointments with you.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Prescriptions Written -->
+    <div class="card a4" id="prescriptions">
+      <div class="card-header"><h3>💊 Prescriptions Written</h3></div>
+      <div class="card-body pad-sm">
+        {% if prescriptions %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Patient</th><th>Diagnosis</th><th>Medicines</th><th>Follow-up</th><th>Date</th></tr></thead>
+            <tbody>
+              {% for p in prescriptions %}
+              <tr>
+                <td><strong>{{ p.patient.user.name }}</strong></td>
+                <td class="text-muted text-sm">{{ p.diagnosis[:40] if p.diagnosis else '—' }}</td>
+                <td class="text-muted text-sm">{{ p.medicines[:50] if p.medicines else '—' }}{% if p.medicines and p.medicines|length > 50 %}...{% endif %}</td>
+                <td>
+                  {% if p.follow_up_date %}
+                  <span style="color:var(--warning);font-size:0.82rem;">{{ p.follow_up_date }}</span>
+                  {% else %}<span class="text-muted">—</span>{% endif %}
+                </td>
+                <td class="text-muted text-sm">{{ p.created_at.strftime('%b %d, %Y') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty">
+          <div class="empty-icon">💊</div>
+          <h4>No prescriptions yet</h4>
+          <p>Approve an appointment and click "Prescribe" to write one.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

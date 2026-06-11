@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Sign In — ClinIQ{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <!-- Left Panel -->
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:2rem;">
+        <div class="brand-icon" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 16px var(--primary-glow);">🏥</div>
+        <span style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ClinIQ</span>
+      </div>
+      <div class="auth-tagline">
+        Your Health,<br><span>Intelligently</span><br>Managed.
+      </div>
+      <p class="auth-desc">AI-powered disease detection for Pneumonia &amp; Jaundice, combined with complete clinic management in one platform.</p>
+      <ul class="auth-feature-list">
+        <li><span class="check">✓</span> Gemini AI Symptom Analysis</li>
+        <li><span class="check">✓</span> Pneumonia &amp; Jaundice Detection</li>
+        <li><span class="check">✓</span> Doctor Appointment Booking</li>
+        <li><span class="check">✓</span> Digital Prescription Management</li>
+        <li><span class="check">✓</span> Role-based Secure Access</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo-sm">
+          <div class="ic">🏥</div> ClinIQ
+        </div>
+        <h2>Welcome back</h2>
+        <p>Sign in to your account to continue</p>
+      </div>
+
+      <form method="POST" id="login-form">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-icon">
+            <span class="icon">📧</span>
+            <input type="email" name="email" class="form-control" placeholder="you@example.com" required id="login-email" autocomplete="email"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-icon">
+            <span class="icon">🔒</span>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" required id="login-password" autocomplete="current-password"/>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="login-btn" style="margin-top:0.5rem;">
+          Sign In →
+        </button>
+      </form>
+
+      <div class="or-sep">or continue with demo</div>
+
+      <div class="demo-box">
+        <div class="demo-title">🧪 Quick Demo Access</div>
+        <div class="demo-row" onclick="fillLogin('admin@cliniq.com','admin123')">
+          <span class="role-badge badge badge-admin">Admin</span>
+          <span class="creds">admin@cliniq.com / admin123</span>
+        </div>
+        <div class="demo-row" onclick="fillLogin('doctor@cliniq.com','doctor123')">
+          <span class="role-badge badge badge-doctor">Doctor</span>
+          <span class="creds">doctor@cliniq.com / doctor123</span>
+        </div>
+      </div>
+
+      <p style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-3);">
+        New to ClinIQ? <a href="{{ url_for('register') }}" style="color:var(--primary-light);font-weight:600;">Create account</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function fillLogin(email, pass) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-password').value = pass;
+  document.getElementById('login-email').focus();
+}
+document.getElementById('login-form').addEventListener('submit', () => {
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

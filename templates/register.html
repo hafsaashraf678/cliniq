@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Create Account — ClinIQ{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:2rem;">
+        <div class="brand-icon" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 16px var(--primary-glow);">🏥</div>
+        <span style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ClinIQ</span>
+      </div>
+      <div class="auth-tagline">Join the<br><span>Smart Clinic</span><br>Revolution.</div>
+      <p class="auth-desc">Get AI-powered health analysis and connect with specialist doctors — all for free.</p>
+      <ul class="auth-feature-list">
+        <li><span class="check">✓</span> Free AI symptom analysis</li>
+        <li><span class="check">✓</span> Book appointments instantly</li>
+        <li><span class="check">✓</span> Digital prescription access</li>
+        <li><span class="check">✓</span> Complete health history</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="auth-right" style="align-items:flex-start;padding-top:2rem;overflow-y:auto;">
+    <div class="auth-card" style="max-width:460px;padding-top:2rem;">
+      <div class="auth-header">
+        <div class="auth-logo-sm"><div class="ic">🏥</div> ClinIQ</div>
+        <h2>Create account</h2>
+        <p>Fill in your details to get started</p>
+      </div>
+
+      <form method="POST" id="reg-form">
+        <div class="form-group">
+          <label class="form-label">I am a...</label>
+          <div class="role-selector">
+            <input type="radio" name="role" value="patient" id="r1" class="role-radio" checked/>
+            <label for="r1" class="role-pill"><span class="ri">🤒</span>Patient</label>
+            <input type="radio" name="role" value="doctor" id="r2" class="role-radio"/>
+            <label for="r2" class="role-pill"><span class="ri">👨‍⚕️</span>Doctor</label>
+            <input type="radio" name="role" value="admin" id="r3" class="role-radio"/>
+            <label for="r3" class="role-pill"><span class="ri">👨‍💼</span>Admin</label>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" placeholder="Your name" required id="reg-name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control" placeholder="0300-0000000" id="reg-phone"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="you@example.com" required id="reg-email"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Min 6 characters" required id="reg-password"/>
+        </div>
+
+        <!-- Patient fields -->
+        <div id="patient-fields">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <input type="number" name="age" class="form-control" placeholder="25" min="1" max="120" id="reg-age"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <select name="gender" class="form-control" id="reg-gender">
+                <option>Female</option><option>Male</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor fields -->
+        <div id="doctor-fields" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Specialization</label>
+              <select name="specialization" class="form-control" id="reg-spec">
+                <option>General Physician</option>
+                <option>Pulmonologist</option>
+                <option>Hepatologist</option>
+                <option>Cardiologist</option>
+                <option>Pediatrician</option>
+                <option>Dermatologist</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">License No.</label>
+              <input type="text" name="license" class="form-control" placeholder="PMC-12345" id="reg-license"/>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="reg-btn" style="margin-top:0.5rem;">
+          Create Account →
+        </button>
+      </form>
+
+      <p style="text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--text-3);">
+        Already have an account? <a href="{{ url_for('login') }}" style="color:var(--primary-light);font-weight:600;">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('.role-radio').forEach(r => r.addEventListener('change', () => {
+  const v = document.querySelector('.role-radio:checked').value;
+  document.getElementById('patient-fields').style.display = v === 'patient' ? 'block' : 'none';
+  document.getElementById('doctor-fields').style.display  = v === 'doctor'  ? 'block' : 'none';
+}));
+document.getElementById('reg-form').addEventListener('submit', () => {
+  const btn = document.getElementById('reg-btn');
+  btn.innerHTML = '<span class="spinner"></span> Creating...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

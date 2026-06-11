@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block title %}Patient Dashboard — ClinIQ{% endblock %}
+{% block content %}
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="avatar patient">{{ current_user.name[0].upper() }}</div>
+      <div class="profile-info">
+        <div class="pname">{{ current_user.name }}</div>
+        <div class="prole patient">Patient</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <a href="{{ url_for('dashboard') }}"       class="nav-link active"><span class="ni">🏠</span> Dashboard</a>
+      <a href="{{ url_for('symptom_checker') }}" class="nav-link"><span class="ni">🤖</span> AI Symptom Checker</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Health</div>
+      <a href="#appointments"  class="nav-link"><span class="ni">📅</span> My Appointments</a>
+      <a href="#prescriptions" class="nav-link"><span class="ni">💊</span> Prescriptions</a>
+      <a href="#book"          class="nav-link"><span class="ni">➕</span> Book Appointment</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="{{ url_for('logout') }}" class="nav-link danger"><span class="ni">🚪</span> Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header a1">
+      <div>
+        <h1>Hello, {{ current_user.name.split()[0] }} 👋</h1>
+        <p class="sub">Welcome to your personal health dashboard</p>
+      </div>
+      <div class="header-actions">
+        <a href="{{ url_for('symptom_checker') }}" class="btn btn-primary">🤖 Check Symptoms</a>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row a2">
+      <div class="stat-card purple">
+        <div class="stat-top">
+          <div class="stat-icon purple">📅</div>
+          <span class="stat-trend neutral">Total</span>
+        </div>
+        <div class="stat-value">{{ appointments|length }}</div>
+        <div class="stat-label">Appointments</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="stat-top">
+          <div class="stat-icon cyan">🤖</div>
+          <span class="stat-trend neutral">AI</span>
+        </div>
+        <div class="stat-value">{{ diagnoses|length }}</div>
+        <div class="stat-label">Symptom Checks</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-top">
+          <div class="stat-icon green">💊</div>
+          <span class="stat-trend neutral">Rx</span>
+        </div>
+        <div class="stat-value">{{ prescriptions|length }}</div>
+        <div class="stat-label">Prescriptions</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-top">
+          <div class="stat-icon amber">⏳</div>
+          <span class="stat-trend up">Pending</span>
+        </div>
+        <div class="stat-value">{{ appointments|selectattr('status','eq','pending')|list|length }}</div>
+        <div class="stat-label">Awaiting Approval</div>
+      </div>
+    </div>
+
+    <div class="g2 a3">
+      <!-- Book Appointment -->
+      <div class="card" id="book">
+        <div class="card-header">
+          <h3>➕ Book Appointment</h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('book_appointment') }}">
+            <div class="form-group">
+              <label class="form-label">Select Doctor</label>
+              <select name="doctor_id" class="form-control" required id="sel-doctor">
+                <option value="">— Choose a specialist —</option>
+                {% for doc in doctors %}
+                <option value="{{ doc.id }}">Dr. {{ doc.user.name }} · {{ doc.specialization }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" name="date" class="form-control" required id="appt-date"/>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time</label>
+                <select name="time" class="form-control" id="appt-time">
+                  <option>09:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+                  <option>12:00 PM</option><option>02:00 PM</option><option>03:00 PM</option>
+                  <option>04:00 PM</option><option>05:00 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reason for Visit</label>
+              <textarea name="reason" class="form-control" rows="3" placeholder="Describe your symptoms or reason..." id="appt-reason"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="book-btn">📅 Book Appointment</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Recent AI Diagnoses -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🤖 Recent AI Checks</h3>
+          <a href="{{ url_for('symptom_checker') }}" class="btn btn-ghost btn-sm">+ New Check</a>
+        </div>
+        <div class="card-body pad-sm">
+          {% if diagnoses %}
+            {% for d in diagnoses[:5] %}
+            <div style="padding:12px;border-radius:var(--radius-sm);margin-bottom:8px;background:var(--bg-surface);border:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;gap:10px;">
+              <div>
+                <span class="badge badge-{{ d.disease_detected.lower() if d.disease_detected else 'neither' }}" style="margin-bottom:4px;">{{ d.disease_detected or 'N/A' }}</span>
+                <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px;">{{ d.symptoms[:60] }}{% if d.symptoms|length > 60 %}...{% endif %}</p>
+              </div>
+              <span style="font-size:0.72rem;color:var(--text-4);white-space:nowrap;">{{ d.created_at.strftime('%b %d') }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty">
+              <div class="empty-icon">🤖</div>
+              <h4>No checks yet</h4>
+              <p><a href="{{ url_for('symptom_checker') }}" style="color:var(--primary-light);">Start your first AI symptom check</a></p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointments -->
+    <div class="card a4" id="appointments">
+      <div class="card-header"><h3>📅 My Appointments</h3></div>
+      <div class="card-body pad-sm">
+        {% if appointments %}
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Doctor</th><th>Specialization</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for a in appointments %}
+              <tr>
+                <td><strong>Dr. {{ a.doctor.user.name }}</strong></td>
+                <td class="text-muted">{{ a.doctor.specialization }}</td>
+                <td>{{ a.date }}</td>
+                <td>{{ a.time }}</td>
+                <td class="text-muted text-sm">{{ a.reason[:40] if a.reason else '—' }}{% if a.reason and a.reason|length > 40 %}...{% endif %}</td>
+                <td><span class="badge badge-{{ a.status }}">{{ a.status.title() }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <div class="empty"><div class="empty-icon">📅</div><h4>No appointments</h4><p>Book your first appointment above.</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Prescriptions -->
+    <div class="card a5" id="prescriptions">
+      <div class="card-header"><h3>💊 My Prescriptions</h3></div>
+      <div class="card-body">
+        {% if prescriptions %}
+          {% for p in prescriptions %}
+          <div class="rx-card">
+            <div class="rx-header">
+              <div>
+                <div class="rx-doc">Dr. {{ p.doctor.user.name }}</div>
+                <div class="rx-spec">{{ p.doctor.specialization }}</div>
+              </div>
+              <div class="rx-date">{{ p.created_at.strftime('%b %d, %Y') }}</div>
+            </div>
+            <div class="rx-body">
+              {% if p.diagnosis %}
+              <div class="rx-section">
+                <div class="rx-section-title">Diagnosis</div>
+                <span style="font-size:0.9rem;color:var(--text-2);">{{ p.diagnosis }}</span>
+              </div>
+              {% endif %}
+              <div class="rx-section">
+                <div class="rx-section-title">Medicines</div>
+                {% for med in p.medicines.split('\n') if med.strip() %}
+                <span class="med-pill">💊 {{ med }}</span>
+                {% endfor %}
+              </div>
+              {% if p.instructions %}
+              <div class="rx-instructions">📋 {{ p.instructions }}</div>
+              {% endif %}
+              {% if p.follow_up_date %}
+              <div class="rx-followup">⚠️ Follow-up: {{ p.follow_up_date }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty"><div class="empty-icon">💊</div><h4>No prescriptions yet</h4><p>Prescriptions from your doctors will appear here.</p></div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('appt-date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

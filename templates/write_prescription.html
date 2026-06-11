@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Write Prescription — ClinIQ{% endblock %}
+{% block content %}
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="avatar doctor">{{ current_user.name[0].upper() }}</div>
+      <div class="profile-info">
+        <div class="pname">Dr. {{ current_user.name }}</div>
+        <div class="prole doctor">Doctor</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Navigation</div>
+      <a href="{{ url_for('dashboard') }}" class="nav-link"><span class="ni">🏠</span> Dashboard</a>
+      <a href="{{ url_for('dashboard') }}#appointments" class="nav-link"><span class="ni">📅</span> Appointments</a>
+    </div>
+    <div class="nav-section" style="margin-top:auto;">
+      <a href="{{ url_for('logout') }}" class="nav-link danger"><span class="ni">🚪</span> Logout</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="breadcrumb a1">
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <span>›</span>
+      <span>Write Prescription</span>
+    </div>
+
+    <div class="page-header a1">
+      <div>
+        <h1>💊 Write Prescription</h1>
+        <p class="sub">For patient: <strong>{{ patient.user.name }}</strong></p>
+      </div>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back</a>
+    </div>
+
+    <div style="max-width:680px;">
+      <!-- Patient Info -->
+      <div class="card a2">
+        <div class="card-header"><h3>🤒 Patient Information</h3></div>
+        <div class="card-body">
+          <div class="g3">
+            <div style="background:var(--bg-surface);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
+              <div class="text-xs text-muted mb-1">Full Name</div>
+              <div class="fw-700">{{ patient.user.name }}</div>
+            </div>
+            <div style="background:var(--bg-surface);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
+              <div class="text-xs text-muted mb-1">Age</div>
+              <div class="fw-700">{{ patient.age or '—' }} yrs</div>
+            </div>
+            <div style="background:var(--bg-surface);padding:14px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
+              <div class="text-xs text-muted mb-1">Gender</div>
+              <div class="fw-700">{{ patient.gender or '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prescription Form -->
+      <div class="card a3">
+        <div class="card-header">
+          <h3>📋 Prescription Details</h3>
+          <span class="text-xs text-muted">All fields marked * required</span>
+        </div>
+        <div class="card-body">
+          <form method="POST" id="rx-form">
+            <div class="form-group">
+              <label class="form-label">Diagnosis *</label>
+              <input type="text" name="diagnosis" class="form-control"
+                placeholder="e.g. Community-acquired Pneumonia, Jaundice (Hepatitis A)"
+                required id="rx-diag"/>
+              <!-- Quick fill buttons -->
+              <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('rx-diag').value='Community-acquired Pneumonia'">🫁 Pneumonia</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('rx-diag').value='Jaundice (Hepatitis A)'">💛 Jaundice</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('rx-diag').value='Upper Respiratory Tract Infection'">😷 URTI</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Medicines * <span class="text-muted text-xs">(one per line)</span></label>
+              <textarea name="medicines" class="form-control" rows="5" required id="rx-meds"
+                placeholder="Amoxicillin 500mg — 3 times daily for 7 days&#10;Paracetamol 500mg — as needed for fever&#10;Vitamin C 1000mg — once daily"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Instructions & Advice</label>
+              <textarea name="instructions" class="form-control" rows="3" id="rx-inst"
+                placeholder="Get complete bed rest. Drink 8-10 glasses of water daily. Avoid cold drinks. Return if symptoms worsen in 48 hours."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Follow-up Date <span class="text-muted text-xs">(optional)</span></label>
+              <input type="date" name="follow_up_date" class="form-control" id="rx-followup"/>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:1rem;">
+              <button type="submit" class="btn btn-primary" id="rx-submit">💊 Save Prescription</button>
+              <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('rx-followup').min = new Date().toISOString().split('T')[0];
+document.getElementById('rx-form').addEventListener('submit', () => {
+  const btn = document.getElementById('rx-submit');
+  btn.innerHTML = '<span class="spinner"></span> Saving...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

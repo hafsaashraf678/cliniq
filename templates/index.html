@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}ClinIQ — AI-Powered Disease Detection & Clinic Management{% endblock %}
+{% block content %}
+<div class="bg-blob-3"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="dot"></span>
+    Powered by Gemini AI · v1.0.0
+  </div>
+  <h1>
+    Smart Clinic.<br>
+    <span class="line2">AI Disease Detection.</span>
+  </h1>
+  <p class="hero-sub">
+    ClinIQ detects <strong>Pneumonia</strong> &amp; <strong>Jaundice</strong> from your symptoms using advanced AI. Book appointments, manage prescriptions — all in one place.
+  </p>
+  <div class="hero-actions">
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get Started Free →</a>
+    <a href="{{ url_for('login') }}"    class="btn btn-outline  btn-lg">Sign In</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">2</div><div class="lbl">Diseases Detected</div></div>
+    <div class="hero-stat"><div class="num">AI</div><div class="lbl">Powered Analysis</div></div>
+    <div class="hero-stat"><div class="num">3</div><div class="lbl">User Roles</div></div>
+    <div class="hero-stat"><div class="num">100%</div><div class="lbl">Accurate Tested</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="features-section">
+  <div class="section-header">
+    <span class="section-label">Core Features</span>
+    <h2>Everything a modern clinic needs</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feat-card a1">
+      <div class="feat-icon-wrap rose">🫁</div>
+      <h3>Pneumonia Detection</h3>
+      <p>AI analyzes chest pain, fever, cough, shortness of breath and breathing difficulty to assess pneumonia risk with precision.</p>
+    </div>
+    <div class="feat-card a2">
+      <div class="feat-icon-wrap amber">💛</div>
+      <h3>Jaundice Detection</h3>
+      <p>Detect jaundice from yellow skin, dark urine, nausea, abdominal pain and weakness through intelligent symptom analysis.</p>
+    </div>
+    <div class="feat-card a3">
+      <div class="feat-icon-wrap purple">📅</div>
+      <h3>Smart Appointments</h3>
+      <p>Book appointments with specialists. Get real-time approval notifications and manage your full appointment schedule.</p>
+    </div>
+    <div class="feat-card a4">
+      <div class="feat-icon-wrap green">💊</div>
+      <h3>Digital Prescriptions</h3>
+      <p>Doctors write secure digital prescriptions. Patients access their complete medication history anytime, anywhere.</p>
+    </div>
+    <div class="feat-card a5">
+      <div class="feat-icon-wrap cyan">👨‍⚕️</div>
+      <h3>Doctor Portal</h3>
+      <p>Specialist doctors manage patient appointments, write prescriptions and track health progress with a dedicated portal.</p>
+    </div>
+    <div class="feat-card a6">
+      <div class="feat-icon-wrap indigo">📊</div>
+      <h3>Admin Dashboard</h3>
+      <p>Complete system overview with patient analytics, doctor management, AI diagnosis logs and performance metrics.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">🏥 ClinIQ v1.0.0 — SE CEP Project · Built with Python Flask + Gemini AI</div>
+{% endblock %}
