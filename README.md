@@ -88,8 +88,6 @@ cliniq/
 ├── requirements.txt        # Python dependencies
 ├── .env                    # API keys (not committed)
 ├── .gitignore
-├── SE_Documentation.md     # Full SE documentation (33 items)
-├── ClinIQ_SE_Documentation.docx  # Word version of documentation
 ├── static/
 │   └── css/
 │       └── style.css       # Professional dark theme CSS
